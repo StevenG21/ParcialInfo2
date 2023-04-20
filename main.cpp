@@ -5,38 +5,39 @@ using namespace std;
 
 int nmaterias=0;
 int codigos[10];
-bool horariomatriz[14][6];
+int HTP[10];
+char horariomatriz[14][6];
 
 void matrizcero(){
     for(int i=0;i<15;i++){
         for(int j=0;j<7;j++){
-            horariomatriz[i][j]=0;
+            horariomatriz[i][j]=' ';
         }
     }
 }
 
 void rellenarmatriz(int fila, char dia){
     if(dia == 'L'){
-        horariomatriz[fila-6][0]=1;
+        horariomatriz[fila-6][0]='X';
         }
     else if(dia == 'M'){
-        horariomatriz[fila-6][1]=1;
+        horariomatriz[fila-6][1]='X';
 
     }
-    else if(dia == 'X'){
-        horariomatriz[fila-6][2]=1;
+    else if(dia == 'W'){
+        horariomatriz[fila-6][2]='X';
 
     }
     else if(dia == 'J'){
-        horariomatriz[fila-6][3]=1;
+        horariomatriz[fila-6][3]='X';
 
     }
     else if(dia == 'V'){
-        horariomatriz[fila-6][4]=1;
+        horariomatriz[fila-6][4]='X';
 
     }
     else if(dia == 'S'){
-        horariomatriz[fila-6][5]=1;
+        horariomatriz[fila-6][5]='X';
 
     }
 
@@ -57,10 +58,10 @@ void Cursos(){
            cin >> c;
            archivo << c <<";";
 
-               cout<<"Ingrese HTD: ";
+               cout<<"Ingrese Numero de Creditos: ";
                cin >> c;
                archivo << c <<";";
-                   cout<<"Ingrese Numero de creditos: ";
+                   cout<<"Ingrese HTD: ";
                    cin >> c;
                    archivo << c <<";";
 
@@ -77,7 +78,7 @@ void Cursos(){
 
 void Horario(){
      char* c= new char;
-    fstream archivo("horario.txt", ios::in | ios::out | ios::app); // Se abre el archivo en modo de lectura y escritura
+    ofstream archivo("horario.txt",ios::out | ios::app); // Se abre el archivo en modo de lectura y escritura
 
         if (archivo.is_open()) { // Verificar si el archivo se abrió correctamente
 
@@ -106,17 +107,21 @@ int leer(){
 
     ifstream archivo("archivo.txt");
         if (archivo.is_open()) {
+            nmaterias=0;
             char c;
-            int num = 0, campo = 0, f=0;
+            int num = 0, campo = 0, f=0, g=0;
             char nombre[20];
             int i = 0;//Recorre el nombre
             while (archivo.get(c)) {
                 if (c == ';') {
-                    codigos[f]=num; //Me guarda los codigos de cada materia
-                    f++;
+
                     campo++;
                     i = 0;
                 } else if (c == '\n') {
+                    codigos[f]=num; //Me guarda los codigos de cada materia
+                    f++;
+                    g++;
+                    nmaterias++;
 
                     num = 0;
                     campo = 0;
@@ -129,6 +134,12 @@ int leer(){
                     } else if (campo == 1) {
                         nombre[i++] = c;
                     }
+                    else if (campo == 2){
+                        int htp=((c-'0')*48)/16;
+                        HTP[g]=htp;
+
+
+                    }
                 }
             }
 
@@ -136,7 +147,7 @@ int leer(){
         }
 
         else {
-            cout << "Error al abrir el archivo." << endl;
+            cout << "Todavia no has registrado los cursos." << endl;
         }
 
 
@@ -166,8 +177,8 @@ void leerHorario(){
                     count2=0;
 
                     for(int i=0;i<2;i++){
-                        for(int j=0;j<2;j++){
-                            rellenarmatriz(hora[j],Dias[i]); //Guarda en la matriz los horarios ocupados
+                        for(int j = hora[0];j<=hora[1];j++){
+                            rellenarmatriz(j,Dias[i]); //Guarda en la matriz los horarios ocupados
                        }
                    }
 
@@ -212,27 +223,59 @@ void leerHorario(){
 }
 
 void mostrarhorario(){
-    cout<<"L M X J V S"<<endl;
+    cout<<"L M X J V S Hora"<<endl;
     for(int i=0;i<15;i++){
 
         for(int j=0;j<6;j++){
 
             cout<<horariomatriz[i][j]<<' ';
         }
-        cout <<"Hora: "<<i+6<<":00"<<endl;
+        cout <<i+6<<":00"<<endl;
 
     }
 
 }
 
+int menu(){
+    int x=0;
+    cout <<"Que desea hacer ?"<<endl;
+    cout <<"1. Registrar cursos."<<endl;
+    cout <<"2. Registrar Horarios."<<endl;
+    cout <<"3. Visualizar Horario."<<endl;
+    cout <<"0. Salir."<<endl;
+    cin >> x;
+    return x;
+}
 
 int main()
 {
 matrizcero();
+leer();
+ //Esta funcion lee el archivo y guarda en un arreglo los codigos, en otro las horas de trabajo personal.
+int x = 0;
+do{
+   x = menu();
+    switch (x) {
+    case 1:
+        Cursos();
+        leer();
+        break;
+    case 2:
+        Horario();
+        break;
+    case 3:
+        leerHorario();
+        mostrarhorario();
+        break;
+    }
+}while(x!=0);
+
+
+
 //cout<<"Numero de materias: ";
 //cin >> nmaterias;
-//leer();
+
 //Horario();
-leerHorario();
-mostrarhorario();
+//leerHorario();
+//mostrarhorario();
 }
